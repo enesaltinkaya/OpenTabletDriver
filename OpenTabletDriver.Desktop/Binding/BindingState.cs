@@ -15,10 +15,12 @@ namespace OpenTabletDriver.Desktop.Binding
 
         private bool _previousState;
 
-        public void Invoke(IDeviceReport report, bool newState)
-        {
-            if (_binding is IStateBinding stateBinding)
-            {
+        public void Invoke(IDeviceReport report, bool newState) {
+            float pressure = 0;
+            if (report is ITabletReport tabletReport) pressure = tabletReport.Pressure;
+            newState = newState & pressure > 0;
+
+            if (_binding is IStateBinding stateBinding) {
                 if (newState && !_previousState)
                     stateBinding.Press(report);
                 else if (!newState && _previousState)

@@ -104,7 +104,8 @@ namespace OpenTabletDriver.Desktop.Interop.Input.Absolute
 
         public void SetPressure(float percentage)
         {
-            Device.Write(EventType.EV_ABS, EventCode.ABS_PRESSURE, (int)(MAX_PRESSURE * percentage));
+            if (OpenTabletDriver.Desktop.Binding.LinuxArtistMode.LinuxArtistModeButtonBinding.allowPressure)
+                Device.Write(EventType.EV_ABS, EventCode.ABS_PRESSURE, (int)(MAX_PRESSURE * percentage));
         }
 
         public void SetTilt(Vector2 tilt)

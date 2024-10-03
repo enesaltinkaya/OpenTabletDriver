@@ -93,13 +93,31 @@ namespace OpenTabletDriver.Desktop.Binding
 
         private void HandleTabletReport(PenSpecifications pen, ITabletReport report)
         {
-            var pressurePercent = report.Pressure / (float)pen.MaxPressure * 100f;
-            if (_isEraser)
-                Eraser?.Invoke(report, pressurePercent);
-            else
-                Tip?.Invoke(report, pressurePercent);
+ 
+            // determine if a pen button is pressed
+            bool anyPenButtonPressed = false;
+            IList<bool> newStates = report.PenButtons;
+            for (var i = 0; i < newStates.Count; i++)
+            {
+                if (newStates[i]) {
+                    anyPenButtonPressed = true;
+                    break;
+                }
+            }
 
-            HandleBindingCollection(report, PenButtons, report.PenButtons);
+            // if a pen button is pressed, handle that
+            // otherwise handle tip or eraser
+            // because we dont want both tip and button triggering at the same time
+            if (anyPenButtonPressed) {
+                HandleBindingCollection(report, PenButtons, report.PenButtons);
+            } else {
+                var pressurePercent = report.Pressure / (float)pen.MaxPressure * 100f;
+                if (_isEraser)
+                    Eraser?.Invoke(report, pressurePercent);
+                else
+                    Tip?.Invoke(report, pressurePercent);
+            }
+
         }
 
         private void HandleAuxiliaryReport(IAuxReport report)

@@ -42,6 +42,8 @@ namespace OpenTabletDriver.Desktop.Binding.LinuxArtistMode
             SetState(false);
         }
 
+        public static bool allowPressure = true;
+
         private void SetState(bool state)
         {
             var eventCode = Button switch
@@ -52,6 +54,14 @@ namespace OpenTabletDriver.Desktop.Binding.LinuxArtistMode
                 "Pen Button 3" => EventCode.BTN_STYLUS3,
                 _ => throw new InvalidOperationException($"Invalid Button '{Button}'")
             };
+            
+            // if a pen button is pressed, dont let pressure events to be sent
+            // because we dont want both tip and button triggering at the same time
+            if (eventCode != EventCode.BTN_TOUCH && state) {
+                allowPressure = false;
+            } else {
+                allowPressure = true;
+            }
 
             _virtualTablet.SetKeyState(eventCode, state);
         }
